@@ -11,6 +11,8 @@ module i2c_master (
 	output clk_os
 );
 
+// PARAM FOR SETTINGS
+
   localparam SLAVE_ADDR = 7'b1010000;
   localparam R = 1'b1;
   localparam W = 1'b0;
@@ -57,6 +59,7 @@ module i2c_master (
   logic led_write_pulse_r;		 
   logic led_read_pulse_r;		 
 
+// LEDS FOR READ/WRITE _ ACK DEBUG
    
   led_driver led_driver_m0 (
       .clk_i  (clk_i),
@@ -87,6 +90,8 @@ module i2c_master (
   );
 
   assign clk_os = clk_div_w;
+
+// THIS CONTROLLER
 
   i2c_controller i2c_controller_m0 (
 
@@ -135,6 +140,8 @@ module i2c_master (
 
     end
   end
+
+// COMMAND STATE MACHINE
 
   logic [4:0] counter_r = 0;
   always @(posedge ready_w or negedge rstn_i) begin
@@ -329,70 +336,72 @@ module led_driver (
 
 endmodule
 
-module gpio_debouncer #(
-    parameter CNT_WIDTH = 32,   
-    parameter FREQ = 50,   
-    parameter MAX_TIME = 20	 
-) (
-    input clk_i,   
-    input rstn_i,   
-    input button_i,   
-    output logic button_posedge_r,   
-    output logic button_negedge_r,   
-    output logic button_out_r   
-);
+// TODO: make some against the button delay
 
-  localparam TIMER_MAX_VAL = MAX_TIME * 1000 * FREQ; 	 
+// module gpio_debouncer #(
+//     parameter CNT_WIDTH = 32,   
+//     parameter FREQ = 50,   
+//     parameter MAX_TIME = 20	 
+// ) (
+//     input clk_i,   
+//     input rstn_i,   
+//     input button_i,   
+//     output logic button_posedge_r,   
+//     output logic button_negedge_r,   
+//     output logic button_out_r   
+// );
 
-  logic  d1;
-  logic  d2;
+//   localparam TIMER_MAX_VAL = MAX_TIME * 1000 * FREQ; 	 
 
-  logic q_reset;
+//   logic  d1;
+//   logic  d2;
 
-  assign q_reset = (d1 ^ d2);
+//   logic q_reset;
 
-  logic [CNT_WIDTH-1:0] q_reg;   
-  logic [CNT_WIDTH-1:0] q_next;   
+//   assign q_reset = (d1 ^ d2);
 
-  logic q_add;
+//   logic [CNT_WIDTH-1:0] q_reg;   
+//   logic [CNT_WIDTH-1:0] q_next;   
 
-  assign q_add = ~(q_reg == TIMER_MAX_VAL);
+//   logic q_add;
 
-  always @(posedge clk_i or negedge rstn_i) begin
-    if (rstn_i == 1'b0) button_out_r <= 1'b1;
-    else if (q_reg == TIMER_MAX_VAL) button_out_r <= d2;
-    else button_out_r <= button_out_r;
-  end
+//   assign q_add = ~(q_reg == TIMER_MAX_VAL);
 
-  always @(q_reset, q_add, q_reg) begin
-    case ({
-      q_reset, q_add
-    })
-      2'b00:   
-      q_next <= q_reg;   
-      2'b01:   
-      q_next <= q_reg + 1;   
-      default:   
-      q_next <= {CNT_WIDTH{1'b0}};   
-    endcase
-  end
+//   always @(posedge clk_i or negedge rstn_i) begin
+//     if (rstn_i == 1'b0) button_out_r <= 1'b1;
+//     else if (q_reg == TIMER_MAX_VAL) button_out_r <= d2;
+//     else button_out_r <= button_out_r;
+//   end
 
-  logic button_out_d0_r;
+//   always @(q_reset, q_add, q_reg) begin
+//     case ({
+//       q_reset, q_add
+//     })
+//       2'b00:   
+//       q_next <= q_reg;   
+//       2'b01:   
+//       q_next <= q_reg + 1;   
+//       default:   
+//       q_next <= {CNT_WIDTH{1'b0}};   
+//     endcase
+//   end
 
-  always @(posedge clk_i or negedge rstn_i) begin
+//   logic button_out_d0_r;
 
-    if (rstn_i == 1'b0) begin
-      button_out_d0_r  <= 1'b1;
-      button_posedge_r <= 1'b0;
-      button_negedge_r <= 1'b0;
-    end else begin
-      button_out_d0_r  <= button_out_r;
-      button_posedge_r <= ~button_out_d0_r & button_out_r;
-      button_negedge_r <= button_out_d0_r & ~button_out_r;
-    end
-  end
+//   always @(posedge clk_i or negedge rstn_i) begin
 
-endmodule
+//     if (rstn_i == 1'b0) begin
+//       button_out_d0_r  <= 1'b1;
+//       button_posedge_r <= 1'b0;
+//       button_negedge_r <= 1'b0;
+//     end else begin
+//       button_out_d0_r  <= button_out_r;
+//       button_posedge_r <= ~button_out_d0_r & button_out_r;
+//       button_negedge_r <= button_out_d0_r & ~button_out_r;
+//     end
+//   end
+
+// endmodule
 
 module clock_divider #(
     parameter DIVISOR = 32   

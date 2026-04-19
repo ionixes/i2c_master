@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+// TODO modeling of slave feedback
+
 module i2c_controller_tb;
 	
 	// Clock
