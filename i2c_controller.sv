@@ -31,29 +31,29 @@ typedef enum logic [3:0] {SETUP = 4'd0, IDLE_STATE = 4'd1, START1_STATE = 4'd2,
 									DATA2_STATE = 4'd11, DATA3_STATE = 4'd12, DATA4_STATE = 4'd13, DATAEND_STATE = 4'd14} statetype;
 
 
-reg sda_out_r;
-reg scl_out_r;
+logic sda_out_r;
+logic scl_out_r;
 
-reg sda_r;
-reg scl_r;
+logic sda_r;
+logic scl_r;
 
-reg data_phase_r;		
+logic data_phase_r;		
 cmdtype cmd_r;		
 cmdtype cmd_next_r;
 
 
-reg [D+1:0] tx_r;
-reg [D+1:0] tx_next_r;
+logic [D+1:0] tx_r;
+logic [D+1:0] tx_next_r;
 	
-reg [D+1:0] rx_r;
-reg [D+1:0] rx_next_r;
+logic [D+1:0] rx_r;
+logic [D+1:0] rx_next_r;
 
-reg [4:0] bit_r;
+logic [4:0] bit_r;
 
-wire into_w;	
+logic into_w;	
 
-reg ready_r;			
-reg [4:0] bit_next_r;		
+logic ready_r;			
+logic [4:0] bit_next_r;		
 
 assign readyo = ready_r;	
 assign bitcount = bit_r;	
@@ -62,7 +62,7 @@ assign bitcount = bit_r;
 assign douto = rx_r[8:1];	
 assign acko = rx_r[0];    	
 
-wire nack_w;
+logic nack_w;
 assign nack_w = dini[0];
 
 assign into_w = (data_phase_r && cmd_r == RD_CMD && bit_r < 8) || (data_phase_r && cmd_r == WR_CMD && bit_r == 8); 

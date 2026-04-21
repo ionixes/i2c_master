@@ -179,38 +179,38 @@ module i2c_master (
 
     if (rstn_i == 1'b0) begin
 
-      led_write_pulse_r = 0;
-      led_read_pulse_r = 0;
+      led_write_pulse_r <= 0;
+      led_read_pulse_r <= 0;
 
-      cmd_r    = START_CMD;
-      state_r   = IDLE_STATE;
-      write_data_r  = 0;
-      wr_i2c_r  = 0;
+      cmd_r    <= START_CMD;
+      state_r   <= IDLE_STATE;
+      write_data_r  <= 0;
+      wr_i2c_r  <= 0;
 
     end else begin
       case (state_r)
 
         IDLE_STATE: begin
-          wr_i2c_r = 0;
+          wr_i2c_r <= 0;
 
-           Button for Read operation	
+       //    Button for Read operation	
           if (btn_brd_i[0]) begin
             if (ready_w) begin
-              state_r = READ_STATE;
+              state_r <= READ_STATE;
             end
           end
 
            
           if (btn_brd_i[1]) begin
             if (ready_w) begin
-              state_r = WRITE_STATE;
+              state_r <= WRITE_STATE;
             end
           end
         end
 
         READ_STATE: begin
           led_read_pulse_r <= ~led_read_pulse_r;   
-          wr_i2c_r = 1;   
+          wr_i2c_r <= 1;   
 
           case (counter_r)
 
@@ -218,38 +218,38 @@ module i2c_master (
             end
 
             1: begin
-              write_data_r = {slave_addr_r, W};   
+              write_data_r <= {slave_addr_r, W};   
             end
 
             2: begin
-              write_data_r = reg_addr_r;
+              write_data_r <= reg_addr_r;
             end
 
             3: begin
               cmd_r = RESTART_CMD;
-              write_data_r = {slave_addr_r, R};
+              write_data_r <= {slave_addr_r, R};
             end
 
             4: begin
               cmd_r = WR_CMD;
-              write_data_r = {slave_addr_r, R};
+              write_data_r <= {slave_addr_r, R};
             end
 
             5: begin
-              cmd_r = RD_CMD;
+              cmd_r <= RD_CMD;
             end
 
             6: begin
-              cmd_r   = STOP_CMD;
+              cmd_r   <= STOP_CMD;
 
-              state_r = WAIT_STATE;
-              timer_r = 0;
+              state_r <= WAIT_STATE;
+              timer_r <= 0;
             end
             default: begin
-              cmd_r = START_CMD;
+              cmd_r <= START_CMD;
 
-              state_r = IDLE_STATE;
-              write_data_r = 0;
+              state_r <= IDLE_STATE;
+              write_data_r <= 0;
             end
 
           endcase
@@ -257,18 +257,18 @@ module i2c_master (
 
         WRITE_STATE: begin
           led_write_pulse_r <= ~led_write_pulse_r;
-          wr_i2c_r = 1;
+          wr_i2c_r <= 1;
 
           case (counter_r)
             0: begin
             end
 
             1: begin
-              write_data_r = {slave_addr_r, W};
+              write_data_r <= {slave_addr_r, W};
             end
 
             2: begin
-              write_data_r = reg_addr_r;
+              write_data_r <= reg_addr_r;
             end
 
             3: begin
@@ -276,16 +276,16 @@ module i2c_master (
             end
 
             4: begin
-              cmd_r   = STOP_CMD;
+              cmd_r   <= STOP_CMD;
 
-              state_r = WAIT_STATE;
-              timer_r = 0;
+              state_r <= WAIT_STATE;
+              timer_r <= 0;
             end
 
             default: begin
-              cmd_r = START_CMD;
-              state_r = IDLE_STATE;
-              write_data_r = 0;
+              cmd_r <= START_CMD;
+              state_r <= IDLE_STATE;
+              write_data_r <= 0;
             end
 
           endcase
@@ -293,17 +293,17 @@ module i2c_master (
 
         WAIT_STATE: begin
 
-          wr_i2c_r = 1;
+          wr_i2c_r <= 1;
 
           if (timer_r >= 32'd1000) begin
             state_r <= IDLE_STATE;
-            write_data_r = 0;
-            cmd_r = START_CMD;
+            write_data_r <= 0;
+            cmd_r <= START_CMD;
           end else timer_r <= timer_r + 32'd1;
         end
 
         default: begin
-          wr_i2c_r = 0;
+          wr_i2c_r <= 0;
           state_r <= IDLE_STATE;
         end
 
@@ -404,7 +404,7 @@ endmodule
 // endmodule
 
 module clock_divider #(
-    parameter DIVISOR = 32   
+    parameter DIVISOR = 64 
 ) (
     input clk_i,
     output logic clk_o
